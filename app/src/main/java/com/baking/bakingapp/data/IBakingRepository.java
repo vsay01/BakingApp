@@ -4,10 +4,10 @@ import com.baking.bakingapp.data.models.BakingWS;
 
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 
 public interface IBakingRepository {
     @NonNull
-    Observable<List<BakingWS>> getBakingRecipes();
+    Single<List<BakingWS>> getBakingRecipes();
 }

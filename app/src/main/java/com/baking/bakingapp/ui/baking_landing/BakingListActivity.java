@@ -1,13 +1,12 @@
 package com.baking.bakingapp.ui.baking_landing;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -15,14 +14,11 @@ import com.baking.bakingapp.R;
 import com.baking.bakingapp.data.models.BakingWS;
 import com.baking.bakingapp.ui.baking_detail.BakingDetailActivity;
 import com.baking.bakingapp.ui.baking_detail.BakingRecipeDetailFragment;
-import com.baking.bakingapp.util.NetworkUtils;
 
 import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.baking.bakingapp.ui.baking_detail.BakingRecipeDetailFragment.ARG_ITEM_COLOR_PALETTE;
-import static com.baking.bakingapp.ui.baking_detail.BakingRecipeDetailFragment.ARG_ITEM_TRANSITION_ID;
 
 /**
  * An activity representing a list of BakingRecipes. This activity
@@ -41,6 +37,9 @@ public class BakingListActivity extends AppCompatActivity {
     private BakingRecipesListViewModel mViewModel;
     private int mSelectedItem = 0;
     private static final String SELECTED_ITEM_POSITION = "ItemPosition";
+
+    @BindView(R.id.item_list)
+    RecyclerView recyclerViewRecipe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,27 +66,30 @@ public class BakingListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
-    }
-
-    private void loadBakingRecipes() {
-        if (NetworkUtils.isOnline(this)) {
-
-        } else {
-
-        }
-    }
-
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView, @NonNull List<BakingWS> bakingWS) {
-        int numberOfColumns = 2;
-        recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
-        recyclerView.setAdapter(new BakingRecipeRecyclerViewAdapter(this, bakingWS, new BakingItemClickListener() {
+        // Get the ViewModel.
+        mViewModel = ViewModelProviders.of(this).get(BakingRecipesListViewModel.class);
+        // Create the observer which updates the UI.
+        final Observer<List<BakingWS>> listObserver = new Observer<List<BakingWS>>() {
             @Override
-            public void onRecipeClicked(BakingWS bakingWS, int colorPalette, AppCompatImageView bakingRecipeImage) {
+            public void onChanged(@NonNull List<BakingWS> bakingWSList) {
+                setupRecyclerView(recyclerViewRecipe, bakingWSList);
+            }
+        };
+
+        // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
+        mViewModel.getListBakingWSMutableLiveData().observe(this, listObserver);
+        mViewModel.fetchBakingRecipes();
+    }
+
+    private void setupRecyclerView(@NonNull RecyclerView recyclerView, @NonNull List<BakingWS> bakingWSList) {
+        int numberOfColumns = 1;
+        recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
+        recyclerView.setAdapter(new BakingRecipeRecyclerViewAdapter(this, bakingWSList, new BakingItemClickListener() {
+            @Override
+            public void onRecipeClicked(BakingWS bakingWS) {
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
                     arguments.putParcelable(BakingRecipeDetailFragment.ARG_ITEM_ID, bakingWS);
-                    arguments.putString(ARG_ITEM_TRANSITION_ID, ViewCompat.getTransitionName(bakingRecipeImage));
-                    arguments.putInt(ARG_ITEM_COLOR_PALETTE, colorPalette);
 
                     BakingRecipeDetailFragment fragment = new BakingRecipeDetailFragment();
                     fragment.setArguments(arguments);
@@ -97,15 +99,7 @@ public class BakingListActivity extends AppCompatActivity {
                 } else {
                     Intent intent = new Intent(BakingListActivity.this, BakingDetailActivity.class);
                     intent.putExtra(BakingRecipeDetailFragment.ARG_ITEM_ID, bakingWS);
-                    intent.putExtra(ARG_ITEM_TRANSITION_ID, ViewCompat.getTransitionName(bakingRecipeImage));
-                    intent.putExtra(ARG_ITEM_COLOR_PALETTE, colorPalette);
-
-                    ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            BakingListActivity.this,
-                            bakingRecipeImage,
-                            ViewCompat.getTransitionName(bakingRecipeImage));
-
-                    startActivity(intent, options.toBundle());
+                    startActivity(intent);
                 }
             }
         }));

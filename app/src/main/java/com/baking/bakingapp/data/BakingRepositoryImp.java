@@ -4,12 +4,14 @@ import android.support.annotation.Nullable;
 
 import com.baking.bakingapp.data.models.BakingWS;
 import com.baking.bakingapp.data.network.IBakingApiService;
+import com.baking.bakingapp.util.Constant;
 
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class BakingRepositoryImp implements IBakingRepository {
@@ -30,10 +32,14 @@ public class BakingRepositoryImp implements IBakingRepository {
     }
 
     public BakingRepositoryImp() {
+
         Retrofit retrofit = new Retrofit.Builder()
-                .addConverterFactory(MoshiConverterFactory.create())
                 .client(new OkHttpClient.Builder().build())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(MoshiConverterFactory.create())
+                .baseUrl(Constant.BASE_URL)
                 .build();
+
         mApiService = retrofit.create(IBakingApiService.class);
     }
 
@@ -46,7 +52,7 @@ public class BakingRepositoryImp implements IBakingRepository {
     }
 
     @Override
-    public Observable<List<BakingWS>> getBakingRecipes() {
-        return null;
+    public Single<List<BakingWS>> getBakingRecipes() {
+        return mApiService.getBakingRecipes();
     }
 }
