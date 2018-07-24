@@ -35,7 +35,6 @@ public class BakingListActivity extends AppCompatActivity {
      */
     private boolean mTwoPane;
     private BakingRecipesListViewModel mViewModel;
-    private int mSelectedItem = 0;
     private static final String SELECTED_ITEM_POSITION = "ItemPosition";
 
     @BindView(R.id.item_list)
@@ -49,13 +48,6 @@ public class BakingListActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setAllowEnterTransitionOverlap(false);
-        }
-
-        supportPostponeEnterTransition();
-        // Check whether we're recreating a previously destroyed instance
-        if (savedInstanceState != null) {
-            // Restore value of members from saved state
-            mSelectedItem = savedInstanceState.getInt(SELECTED_ITEM_POSITION);
         }
 
         if (findViewById(R.id.item_baking_recipe_detail_container) != null) {
@@ -88,11 +80,7 @@ public class BakingListActivity extends AppCompatActivity {
             @Override
             public void onRecipeClicked(BakingWS bakingWS) {
                 if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-                    arguments.putParcelable(BakingRecipeDetailFragment.ARG_ITEM_ID, bakingWS);
-
-                    BakingRecipeDetailFragment fragment = new BakingRecipeDetailFragment();
-                    fragment.setArguments(arguments);
+                    BakingRecipeDetailFragment fragment = BakingRecipeDetailFragment.newInstance(bakingWS);
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.item_baking_recipe_detail_container, fragment)
                             .commit();

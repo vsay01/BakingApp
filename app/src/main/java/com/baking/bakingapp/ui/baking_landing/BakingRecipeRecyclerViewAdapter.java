@@ -42,7 +42,7 @@ public class BakingRecipeRecyclerViewAdapter
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        BakingWS bakingWS = mBakingWSList.get(position);
+        final BakingWS bakingWS = mBakingWSList.get(position);
 
         if (bakingWS != null) {
             GlideApp.with(bakingListActivity)
@@ -53,7 +53,7 @@ public class BakingRecipeRecyclerViewAdapter
 
             holder.bakingRecipeName.setText(bakingWS.name);
 
-            mBakingRecipeClickListener.onRecipeClicked(bakingWS);
+            holder.view.setOnClickListener(v -> mBakingRecipeClickListener.onRecipeClicked(bakingWS));
         }
     }
 
@@ -70,8 +70,11 @@ public class BakingRecipeRecyclerViewAdapter
         @BindView(R.id.tv_baking_recipe_name)
         AppCompatTextView bakingRecipeName;
 
+        View view;
+
         ViewHolder(View view) {
             super(view);
+            this.view = view;
             ButterKnife.bind(this, view);
         }
     }
