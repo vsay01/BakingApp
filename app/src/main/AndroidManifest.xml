@@ -26,6 +26,7 @@
         </activity>
         <activity
             android:name=".ui.baking_detail.BakingDetailActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_item_detail"
             android:parentActivityName=".ui.baking_landing.BakingListActivity"
             android:theme="@style/AppTheme.NoActionBar">

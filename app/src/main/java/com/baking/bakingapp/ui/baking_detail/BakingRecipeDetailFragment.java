@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import com.baking.bakingapp.R;
 import com.baking.bakingapp.data.models.BakingWS;
 import com.baking.bakingapp.ui.baking_detail.ingredients.IngredientFragment;
+import com.baking.bakingapp.ui.baking_detail.steps.StepFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,14 +77,23 @@ public class BakingRecipeDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
+        setupToolbar(toolbar, true);
         setupViewPager(viewPager);
     }
 
     private void setupViewPager(ViewPager viewPager) {
         bakingRecipeDetailFragmentPagerAdapter = new BakingRecipeDetailFragmentPagerAdapter(getChildFragmentManager());
         bakingRecipeDetailFragmentPagerAdapter.addFragment(IngredientFragment.newInstance(bakingWS.ingredients), "Ingredients", 0);
-        bakingRecipeDetailFragmentPagerAdapter.addFragment(IngredientFragment.newInstance(bakingWS.ingredients), "Steps", 1);
+        bakingRecipeDetailFragmentPagerAdapter.addFragment(StepFragment.newInstance(bakingWS.steps), "Steps", 1);
 
         viewPager.setAdapter(bakingRecipeDetailFragmentPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+    }
+
+    public void setupToolbar(Toolbar toolbar, boolean setDisplayHomeAsUpEnabled) {
+        if (toolbar != null) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(setDisplayHomeAsUpEnabled);
+        }
     }
 }
