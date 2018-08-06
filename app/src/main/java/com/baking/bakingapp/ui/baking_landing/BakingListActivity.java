@@ -9,11 +9,13 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 
 import com.baking.bakingapp.R;
 import com.baking.bakingapp.data.models.BakingWS;
 import com.baking.bakingapp.ui.baking_detail.BakingDetailActivity;
 import com.baking.bakingapp.ui.baking_detail.BakingRecipeDetailFragment;
+import com.baking.bakingapp.util.ResourceUtils;
 
 import java.util.List;
 
@@ -29,16 +31,13 @@ import butterknife.ButterKnife;
  * item details side-by-side using two vertical panes.
  */
 public class BakingListActivity extends AppCompatActivity {
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
-    private boolean mTwoPane;
     private BakingRecipesListViewModel mViewModel;
-    private static final String SELECTED_ITEM_POSITION = "ItemPosition";
 
     @BindView(R.id.item_list)
     RecyclerView recyclerViewRecipe;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +49,7 @@ public class BakingListActivity extends AppCompatActivity {
             getWindow().setAllowEnterTransitionOverlap(false);
         }
 
-        if (findViewById(R.id.item_baking_recipe_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
-            mTwoPane = true;
-        }
-
+        toolbar.setTitle(R.string.app_name);
         // Get the ViewModel.
         mViewModel = ViewModelProviders.of(this).get(BakingRecipesListViewModel.class);
         // Create the observer which updates the UI.
@@ -75,21 +67,14 @@ public class BakingListActivity extends AppCompatActivity {
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView, @NonNull List<BakingWS> bakingWSList) {
         int numberOfColumns = 1;
+        if (ResourceUtils.isTablet(this)) {
+            numberOfColumns = 3;
+        }
         recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
-        recyclerView.setAdapter(new BakingRecipeRecyclerViewAdapter(this, bakingWSList, new BakingItemClickListener() {
-            @Override
-            public void onRecipeClicked(BakingWS bakingWS) {
-                if (mTwoPane) {
-                    BakingRecipeDetailFragment fragment = BakingRecipeDetailFragment.newInstance(bakingWS);
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.item_baking_recipe_detail_container, fragment)
-                            .commit();
-                } else {
-                    Intent intent = new Intent(BakingListActivity.this, BakingDetailActivity.class);
-                    intent.putExtra(BakingRecipeDetailFragment.ARG_ITEM_ID, bakingWS);
-                    startActivity(intent);
-                }
-            }
+        recyclerView.setAdapter(new BakingRecipeRecyclerViewAdapter(this, bakingWSList, bakingWS -> {
+            Intent intent = new Intent(BakingListActivity.this, BakingDetailActivity.class);
+            intent.putExtra(BakingRecipeDetailFragment.ARG_ITEM_ID, bakingWS);
+            startActivity(intent);
         }));
     }
 }

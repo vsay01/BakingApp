@@ -91,7 +91,10 @@ public class BakingRecipeDetailFragment extends Fragment {
     }
 
     public void setupToolbar(Toolbar toolbar, boolean setDisplayHomeAsUpEnabled) {
-        if (toolbar != null) {
+        if (toolbar != null && bakingWS != null) {
+            toolbar.setTitle(bakingWS.name);
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+            toolbar.setNavigationOnClickListener(v -> getActivity().onBackPressed());
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
             ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(setDisplayHomeAsUpEnabled);
         }

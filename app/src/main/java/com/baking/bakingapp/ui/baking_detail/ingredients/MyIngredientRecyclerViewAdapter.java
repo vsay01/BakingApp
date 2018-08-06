@@ -1,5 +1,6 @@
 package com.baking.bakingapp.ui.baking_detail.ingredients;
 
+import android.content.Context;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,8 +23,10 @@ import butterknife.ButterKnife;
 public class MyIngredientRecyclerViewAdapter extends RecyclerView.Adapter<MyIngredientRecyclerViewAdapter.ViewHolder> {
 
     private final List<IngredientWS> ingredientWSList;
+    private Context context;
 
-    public MyIngredientRecyclerViewAdapter(List<IngredientWS> items) {
+    public MyIngredientRecyclerViewAdapter(Context context, List<IngredientWS> items) {
+        this.context = context;
         ingredientWSList = items;
     }
 
@@ -38,9 +41,9 @@ public class MyIngredientRecyclerViewAdapter extends RecyclerView.Adapter<MyIngr
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = ingredientWSList.get(position);
         if (holder.mItem != null) {
-            holder.ingredientDescription.setText(holder.mItem.ingredient);
-            holder.ingredientMeasurement.setText(holder.mItem.measure);
-            holder.ingredientQuantity.setText(String.format("%s", holder.mItem.quantity));
+            holder.ingredientDescription.setText(context.getString(R.string.ingredient_name, holder.mItem.ingredient));
+            holder.ingredientMeasurement.setText(context.getString(R.string.ingredient_measurement, holder.mItem.measure));
+            holder.ingredientQuantity.setText(context.getString(R.string.ingredient_quantity, holder.mItem.quantity));
         }
     }
 

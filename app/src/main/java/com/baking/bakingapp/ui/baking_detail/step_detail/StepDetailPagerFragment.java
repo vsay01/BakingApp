@@ -143,6 +143,9 @@ public class StepDetailPagerFragment extends Fragment {
             playerView.setLayoutParams(
                     new ConstraintLayout.LayoutParams(
                             ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT));
+            // TODO: 8/3/18  disable swipe viewpager
+            // TODO: 8/3/18 hide view pager
+
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             //unhide your objects here.
             groupStepDetailExcludePlayer.setVisibility(View.VISIBLE);
@@ -162,6 +165,9 @@ public class StepDetailPagerFragment extends Fragment {
             set.connect(playerView.getId(), ConstraintSet.END, constraintLayoutContainer.getId(), ConstraintSet.END, margin);
 
             set.applyTo(constraintLayoutContainer);
+
+            // TODO: 8/3/18 enable view pager
+            // TODO: 8/3/18 show viewpager
         }
     }
 

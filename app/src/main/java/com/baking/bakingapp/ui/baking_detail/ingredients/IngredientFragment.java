@@ -70,7 +70,7 @@ public class IngredientFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             listIngredient.setLayoutManager(new LinearLayoutManager(context));
-            listIngredient.setAdapter(new MyIngredientRecyclerViewAdapter(ingredientWSList));
+            listIngredient.setAdapter(new MyIngredientRecyclerViewAdapter(getActivity(), ingredientWSList));
         }
         return view;
     }

@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 
 import com.baking.bakingapp.R;
 import com.baking.bakingapp.data.models.StepWS;
-import com.baking.bakingapp.ui.baking_detail.step_detail.StepDetailFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +30,10 @@ public class StepFragment extends Fragment {
     public static final String ARG_ITEM_ID = "item_id";
     private List<StepWS> stepWSList;
     private OnListFragmentInteractionListener listFragmentInteractionListener;
+    private boolean twoPane;
 
     @BindView(R.id.list)
-    RecyclerView listIngredient;
+    RecyclerView listStep;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -64,16 +64,24 @@ public class StepFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_ingredient_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_layout_step, container, false);
 
         ButterKnife.bind(this, view);
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            listIngredient.setLayoutManager(new LinearLayoutManager(context));
-            listIngredient.setAdapter(new MyStepRecyclerViewAdapter(stepWSList, position -> listFragmentInteractionListener.onStepClicked(position)));
+        if (view.findViewById(R.id.item_step_detail_container) != null) {
+            // The detail container view will be present only in the
+            // large-screen layouts (res/values-w900dp).
+            // If this view is present, then the
+            // activity should be in two-pane mode.
+            twoPane = true;
         }
+
+        // Set the adapter
+        //if (view instanceof RecyclerView) {
+            Context context = view.getContext();
+            listStep.setLayoutManager(new LinearLayoutManager(context));
+            listStep.setAdapter(new MyStepRecyclerViewAdapter(stepWSList, position -> listFragmentInteractionListener.onStepClicked(twoPane, position)));
+        //}
         return view;
     }
 
@@ -105,6 +113,6 @@ public class StepFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onStepClicked(int position);
+        void onStepClicked(boolean twoPane, int position);
     }
 }
