@@ -2,6 +2,7 @@ package com.baking.bakingapp.ui.baking_detail.step_detail;
 
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,7 +10,6 @@ import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.constraint.Group;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
@@ -96,8 +96,6 @@ public class StepDetailPagerFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        setupToolbar(toolbar, true);
-
         if (stepWS != null) {
             if (!TextUtils.isEmpty(stepWS.videoURL)) {
                 // In onCreate
@@ -135,7 +133,7 @@ public class StepDetailPagerFragment extends Fragment {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
+        Fragment parentFragment = getParentFragment();
         // Checking the orientation of the screen
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             //First Hide other objects (listview or recyclerview), better hide them using Gone.
@@ -143,11 +141,14 @@ public class StepDetailPagerFragment extends Fragment {
             playerView.setLayoutParams(
                     new ConstraintLayout.LayoutParams(
                             ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT));
-            // TODO: 8/3/18  disable swipe viewpager
-            // TODO: 8/3/18 hide view pager
+            hideSystemUI();
+
+            if (parentFragment instanceof StepDetailFragment) {
+                ((StepDetailFragment) parentFragment).disableViewPagerAndIndicator();
+            }
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            //unhide your objects here.
+            //Unhide your objects here.
             groupStepDetailExcludePlayer.setVisibility(View.VISIBLE);
             playerView.setLayoutParams(
                     new ConstraintLayout.LayoutParams(
@@ -166,8 +167,10 @@ public class StepDetailPagerFragment extends Fragment {
 
             set.applyTo(constraintLayoutContainer);
 
-            // TODO: 8/3/18 enable view pager
-            // TODO: 8/3/18 show viewpager
+            showSystemUI();
+            if (parentFragment instanceof StepDetailFragment) {
+                ((StepDetailFragment) parentFragment).enableViewPagerAndIndicator();
+            }
         }
     }
 
@@ -192,10 +195,30 @@ public class StepDetailPagerFragment extends Fragment {
         }
     }
 
-    public void setupToolbar(Toolbar toolbar, boolean setDisplayHomeAsUpEnabled) {
-        if (toolbar != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(setDisplayHomeAsUpEnabled);
+    private void hideSystemUI() {
+        // Enables regular immersive mode.
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        View decorView = getActivity().getWindow().getDecorView();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE
+                    // Set the content to appear under the system bars so that the
+                    // content doesn't resize when the system bars hide and show.
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    // Hide the nav bar and status bar
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN);
         }
+    }
+
+    // Shows the system bars by removing all the flags
+    // except for the ones that make the content appear under the system bars.
+    private void showSystemUI() {
+        View decorView = getActivity().getWindow().getDecorView();
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
     }
 }

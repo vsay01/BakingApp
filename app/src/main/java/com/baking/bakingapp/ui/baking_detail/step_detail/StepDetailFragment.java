@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.baking.bakingapp.R;
 import com.baking.bakingapp.data.models.StepWS;
+import com.baking.bakingapp.widget.LockableViewPager;
 import com.rd.PageIndicatorView;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class StepDetailFragment extends Fragment {
     Toolbar toolbar;
 
     @BindView(R.id.viewpager)
-    ViewPager viewPager;
+    LockableViewPager viewPager;
 
     @BindView(R.id.pageIndicatorView)
     PageIndicatorView pageIndicatorView;
@@ -91,7 +92,7 @@ public class StepDetailFragment extends Fragment {
         setupViewPager(viewPager);
     }
 
-    private void setupViewPager(ViewPager viewPager) {
+    private void setupViewPager(LockableViewPager viewPager) {
         stepDetailFragmentPagerAdapter = new StepDetailFragmentPagerAdapter(getChildFragmentManager());
         for (StepWS stepWS : stepWSList) {
             stepDetailFragmentPagerAdapter.addFragment(StepDetailPagerFragment.newInstance(stepWS), "Step");
@@ -100,12 +101,49 @@ public class StepDetailFragment extends Fragment {
         viewPager.setAdapter(stepDetailFragmentPagerAdapter);
         viewPager.setCurrentItem(selectedListPosition);
         pageIndicatorView.setViewPager(viewPager);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                selectedListPosition = position;
+                setupToolbar(toolbar, true);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     public void setupToolbar(Toolbar toolbar, boolean setDisplayHomeAsUpEnabled) {
-        if (toolbar != null) {
+        if (toolbar != null && stepWSList != null && stepWSList.get(selectedListPosition) != null) {
+            toolbar.setTitle(stepWSList.get(selectedListPosition).shortDescription);
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+            toolbar.setNavigationOnClickListener(v -> getActivity().onBackPressed());
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
             ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(setDisplayHomeAsUpEnabled);
+        }
+    }
+
+    public void disableViewPagerAndIndicator() {
+        if (viewPager != null && pageIndicatorView != null && toolbar != null) {
+            viewPager.setPagingEnabled(false);
+            pageIndicatorView.setVisibility(View.GONE);
+            toolbar.setVisibility(View.GONE);
+        }
+    }
+
+    public void enableViewPagerAndIndicator() {
+        if (viewPager != null && pageIndicatorView != null && toolbar != null) {
+            viewPager.setPagingEnabled(true);
+            pageIndicatorView.setVisibility(View.VISIBLE);
+            toolbar.setVisibility(View.VISIBLE);
         }
     }
 }
