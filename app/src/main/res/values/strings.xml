@@ -3,4 +3,6 @@
     <string name="ingredient_name">Name: %1$s</string>
     <string name="ingredient_measurement">Measurement: %1$s</string>
     <string name="ingredient_quantity">Quantity: %f</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>
