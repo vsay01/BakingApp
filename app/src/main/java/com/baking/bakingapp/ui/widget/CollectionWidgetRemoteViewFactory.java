@@ -2,10 +2,12 @@ package com.baking.bakingapp.ui.widget;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
 
 import com.baking.bakingapp.data.models.BakingWS;
+import com.baking.bakingapp.ui.baking_detail.BakingRecipeDetailFragment;
 import com.baking.bakingapp.util.ParcelableUtil;
 
 import java.util.ArrayList;
@@ -56,6 +58,13 @@ public class CollectionWidgetRemoteViewFactory implements RemoteViewsFactory {
         if (mCollection != null) {
             view.setTextViewText(android.R.id.text1, mCollection.get(position).name);
         }
+        Bundle extras = new Bundle();
+        extras.putParcelable(BakingRecipeDetailFragment.ARG_ITEM_ID, mCollection.get(position));
+        Intent fillInIntent = new Intent();
+        fillInIntent.putExtras(extras);
+        // Make it possible to distinguish the individual on-click
+        // action of a given item
+        view.setOnClickFillInIntent(android.R.id.text1, fillInIntent);
         return view;
     }
 

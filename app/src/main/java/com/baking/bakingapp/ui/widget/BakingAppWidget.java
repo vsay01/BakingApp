@@ -1,6 +1,7 @@
 package com.baking.bakingapp.ui.widget;
 
 import android.annotation.TargetApi;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.widget.RemoteViews;
 import com.baking.bakingapp.R;
 import com.baking.bakingapp.data.BakingRepositoryImp;
 import com.baking.bakingapp.data.models.BakingWS;
+import com.baking.bakingapp.ui.baking_detail.BakingDetailActivity;
 import com.baking.bakingapp.util.ParcelableUtil;
 
 import java.util.ArrayList;
@@ -44,6 +46,14 @@ public class BakingAppWidget extends AppWidgetProvider {
         } else {
             setRemoteAdapterV11(intent, views);
         }
+        // This section makes it possible for items to have individualized behavior.
+        // It does this by setting up a pending intent template. Individuals items of a collection
+        // cannot set up their own pending intents. Instead, the collection as a whole sets
+        // up a pending intent template, and the individual items set a fillInIntent
+        // to create unique behavior on an item-by-item basis.
+        Intent activityIntent = new Intent(context, BakingDetailActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setPendingIntentTemplate(R.id.widget_list, pendingIntent);
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
