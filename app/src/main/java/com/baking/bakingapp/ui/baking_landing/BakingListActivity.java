@@ -53,12 +53,7 @@ public class BakingListActivity extends AppCompatActivity {
         // Get the ViewModel.
         mViewModel = ViewModelProviders.of(this).get(BakingRecipesListViewModel.class);
         // Create the observer which updates the UI.
-        final Observer<List<BakingWS>> listObserver = new Observer<List<BakingWS>>() {
-            @Override
-            public void onChanged(@NonNull List<BakingWS> bakingWSList) {
-                setupRecyclerView(recyclerViewRecipe, bakingWSList);
-            }
-        };
+        final Observer<List<BakingWS>> listObserver = bakingWSList -> setupRecyclerView(recyclerViewRecipe, bakingWSList);
 
         // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
         mViewModel.getListBakingWSMutableLiveData().observe(this, listObserver);

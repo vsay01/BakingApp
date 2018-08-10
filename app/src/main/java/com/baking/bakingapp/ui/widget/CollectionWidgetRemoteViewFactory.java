@@ -5,27 +5,38 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
 
+import com.baking.bakingapp.data.models.BakingWS;
+import com.baking.bakingapp.util.ParcelableUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class CollectionWidgetRemoteViewFactory implements RemoteViewsFactory {
     private static final String TAG = "WidgetDataProvider";
+    public static final String BYTE_ARRAY_LIST = "BYTE_ARRAY_LIST";
 
-    List<String> mCollection = new ArrayList<>();
+    List<BakingWS> mCollection = new ArrayList<>();
     Context mContext = null;
+    Intent mIntent;
 
     public CollectionWidgetRemoteViewFactory(Context context, Intent intent) {
         mContext = context;
+        mIntent = intent;
     }
 
     @Override
     public void onCreate() {
-        initData();
+
     }
 
     @Override
     public void onDataSetChanged() {
-        initData();
+        if (mIntent != null) {
+            List<byte[]> byteArrayList = ((List<byte[]>) mIntent.getExtras().getSerializable(BYTE_ARRAY_LIST));
+            for (byte[] byteArray : byteArrayList) {
+                mCollection.add(new BakingWS(ParcelableUtil.unmarshall(byteArray)));
+            }
+        }
     }
 
     @Override
@@ -42,7 +53,9 @@ public class CollectionWidgetRemoteViewFactory implements RemoteViewsFactory {
     public RemoteViews getViewAt(int position) {
         RemoteViews view = new RemoteViews(mContext.getPackageName(),
                 android.R.layout.simple_list_item_1);
-        view.setTextViewText(android.R.id.text1, mCollection.get(position));
+        if (mCollection != null) {
+            view.setTextViewText(android.R.id.text1, mCollection.get(position).name);
+        }
         return view;
     }
 
@@ -64,12 +77,5 @@ public class CollectionWidgetRemoteViewFactory implements RemoteViewsFactory {
     @Override
     public boolean hasStableIds() {
         return true;
-    }
-
-    private void initData() {
-        mCollection.clear();
-        for (int i = 1; i <= 10; i++) {
-            mCollection.add("ListView item " + i);
-        }
     }
 }

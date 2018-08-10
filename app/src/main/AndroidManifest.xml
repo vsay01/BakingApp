@@ -45,8 +45,10 @@
                 android:resource="@xml/baking_app_widget_info" />
         </receiver>
 
-        <!-- 2. The service that will send our collection data to our widget. It needs the
-               permission android.permission.BIND_REMOTEVIEWS -->
+        <!--
+             2. The service that will send our collection data to our widget. It needs the
+               permission android.permission.BIND_REMOTEVIEWS
+        -->
         <service
             android:name=".ui.widget.WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />

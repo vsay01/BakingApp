@@ -32,12 +32,12 @@ public class BakingWS implements Parcelable {
     public BakingWS() {
     }
 
-    protected BakingWS(Parcel in) {
+    public BakingWS(Parcel in) {
         this.id = (Integer) in.readValue(Integer.class.getClassLoader());
         this.name = in.readString();
-        this.ingredients = new ArrayList<IngredientWS>();
+        this.ingredients = new ArrayList<>();
         in.readList(this.ingredients, IngredientWS.class.getClassLoader());
-        this.steps = new ArrayList<StepWS>();
+        this.steps = new ArrayList<>();
         in.readList(this.steps, StepWS.class.getClassLoader());
         this.servings = (Integer) in.readValue(Integer.class.getClassLoader());
         this.image = in.readString();
