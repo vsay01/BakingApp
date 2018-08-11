@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
@@ -15,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.baking.bakingapp.IdlingResource.SimpleIdlingResource;
 import com.baking.bakingapp.R;
 import com.baking.bakingapp.data.models.BakingWS;
 import com.baking.bakingapp.data.models.ResponseBakingList;
@@ -57,6 +61,10 @@ public class BakingListActivity extends AppCompatActivity {
     @BindView(R.id.tv_try_again)
     AppCompatTextView tvTryAgain;
 
+    // The Idling Resource which will be null in production.
+    @Nullable
+    private SimpleIdlingResource mIdlingResource;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +86,7 @@ public class BakingListActivity extends AppCompatActivity {
 
         // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
         mViewModel.getListBakingWSMutableLiveData().observe(this, listObserver);
-        
+
         if (!NetworkUtils.isOnline(this)) {
             showCardMessage();
             return;
@@ -120,5 +128,17 @@ public class BakingListActivity extends AppCompatActivity {
             intent.putExtra(BakingRecipeDetailFragment.ARG_ITEM_ID, bakingWS);
             startActivity(intent);
         }));
+    }
+
+    /**
+     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
+     */
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
     }
 }

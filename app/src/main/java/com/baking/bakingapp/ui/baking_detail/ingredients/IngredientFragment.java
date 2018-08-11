@@ -30,7 +30,7 @@ public class IngredientFragment extends Fragment {
     public static final String ARG_ITEM_ID = "item_id";
     private List<IngredientWS> ingredientWSList;
 
-    @BindView(R.id.list)
+    @BindView(R.id.list_ingredient)
     RecyclerView listIngredient;
 
     /**

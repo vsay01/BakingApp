@@ -32,7 +32,7 @@ public class StepFragment extends Fragment {
     private OnListFragmentInteractionListener listFragmentInteractionListener;
     private boolean twoPane;
 
-    @BindView(R.id.list)
+    @BindView(R.id.list_step)
     RecyclerView listStep;
 
     /**
@@ -77,11 +77,9 @@ public class StepFragment extends Fragment {
         }
 
         // Set the adapter
-        //if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            listStep.setLayoutManager(new LinearLayoutManager(context));
-            listStep.setAdapter(new MyStepRecyclerViewAdapter(stepWSList, position -> listFragmentInteractionListener.onStepClicked(twoPane, position)));
-        //}
+        Context context = view.getContext();
+        listStep.setLayoutManager(new LinearLayoutManager(context));
+        listStep.setAdapter(new MyStepRecyclerViewAdapter(stepWSList, position -> listFragmentInteractionListener.onStepClicked(twoPane, position)));
         return view;
     }
 
