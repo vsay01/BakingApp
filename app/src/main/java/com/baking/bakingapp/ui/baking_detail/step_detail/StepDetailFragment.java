@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 
 import com.baking.bakingapp.R;
 import com.baking.bakingapp.data.models.StepWS;
-import com.baking.bakingapp.widget.LockableViewPager;
+import com.baking.bakingapp.widgets.LockableViewPager;
 import com.rd.PageIndicatorView;
 
 import java.util.ArrayList;

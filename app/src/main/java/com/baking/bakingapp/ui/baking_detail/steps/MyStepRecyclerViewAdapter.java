@@ -54,7 +54,7 @@ public class MyStepRecyclerViewAdapter extends RecyclerView.Adapter<MyStepRecycl
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public StepWS mItem;
-        View view;
+        public View view;
 
         @BindView(R.id.tv_step_description)
         AppCompatTextView tvStepDescription;
