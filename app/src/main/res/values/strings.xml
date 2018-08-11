@@ -5,4 +5,6 @@
     <string name="ingredient_quantity">Quantity: %f</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="try_again">Try Again</string>
+    <string name="string_error_message">Sorry, no internet connectivity detected. Please reconnect and try again.</string>
 </resources>
