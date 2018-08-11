@@ -18,6 +18,7 @@ import com.baking.bakingapp.ui.baking_detail.steps.StepFragment;
 public class BakingDetailActivity extends AppCompatActivity implements StepFragment.OnListFragmentInteractionListener {
 
     private BakingWS bakingWS;
+    private BakingRecipeDetailFragment bakingRecipeDetailFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +30,9 @@ public class BakingDetailActivity extends AppCompatActivity implements StepFragm
         if (savedInstanceState == null && getIntent() != null && bakingWS != null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            BakingRecipeDetailFragment fragment = BakingRecipeDetailFragment.newInstance(bakingWS);
+            bakingRecipeDetailFragment = BakingRecipeDetailFragment.newInstance(bakingWS);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.item_baking_recipe_detail_container, fragment)
+                    .add(R.id.item_baking_recipe_detail_container, bakingRecipeDetailFragment)
                     .commit();
         }
     }

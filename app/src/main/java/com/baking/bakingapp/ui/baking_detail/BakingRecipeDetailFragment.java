@@ -35,6 +35,8 @@ public class BakingRecipeDetailFragment extends Fragment {
 
     private BakingWS bakingWS;
     private BakingRecipeDetailFragmentPagerAdapter bakingRecipeDetailFragmentPagerAdapter;
+    private IngredientFragment ingredientFragment;
+    private StepFragment stepFragment;
 
     @BindView(R.id.detail_toolbar)
     Toolbar toolbar;
@@ -82,9 +84,11 @@ public class BakingRecipeDetailFragment extends Fragment {
     }
 
     private void setupViewPager(ViewPager viewPager) {
+        ingredientFragment = IngredientFragment.newInstance(bakingWS.ingredients);
+        stepFragment = StepFragment.newInstance(bakingWS.steps);
         bakingRecipeDetailFragmentPagerAdapter = new BakingRecipeDetailFragmentPagerAdapter(getChildFragmentManager());
-        bakingRecipeDetailFragmentPagerAdapter.addFragment(IngredientFragment.newInstance(bakingWS.ingredients), "Ingredients", 0);
-        bakingRecipeDetailFragmentPagerAdapter.addFragment(StepFragment.newInstance(bakingWS.steps), "Steps", 1);
+        bakingRecipeDetailFragmentPagerAdapter.addFragment(ingredientFragment, "Ingredients", 0);
+        bakingRecipeDetailFragmentPagerAdapter.addFragment(stepFragment, "Steps", 1);
 
         viewPager.setAdapter(bakingRecipeDetailFragmentPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);

@@ -2,6 +2,7 @@ package com.baking.bakingapp.ui.baking_detail.steps;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +32,7 @@ public class StepFragment extends Fragment {
     private List<StepWS> stepWSList;
     private OnListFragmentInteractionListener listFragmentInteractionListener;
     private boolean twoPane;
+    private MyStepRecyclerViewAdapter myStepRecyclerViewAdapter;
 
     @BindView(R.id.list_step)
     RecyclerView listStep;
@@ -68,18 +70,19 @@ public class StepFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
+        myStepRecyclerViewAdapter = new MyStepRecyclerViewAdapter(stepWSList, position -> listFragmentInteractionListener.onStepClicked(twoPane, position));
+        // Set the adapter
+        Context context = view.getContext();
+        listStep.setLayoutManager(new LinearLayoutManager(context));
+        listStep.setAdapter(myStepRecyclerViewAdapter);
         if (view.findViewById(R.id.item_step_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the
             // activity should be in two-pane mode.
             twoPane = true;
+            postAndNotifyAdapter(new Handler(), listStep);
         }
-
-        // Set the adapter
-        Context context = view.getContext();
-        listStep.setLayoutManager(new LinearLayoutManager(context));
-        listStep.setAdapter(new MyStepRecyclerViewAdapter(stepWSList, position -> listFragmentInteractionListener.onStepClicked(twoPane, position)));
         return view;
     }
 
@@ -112,5 +115,16 @@ public class StepFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         void onStepClicked(boolean twoPane, int position);
+    }
+
+    protected void postAndNotifyAdapter(final Handler handler, final RecyclerView recyclerView) {
+        handler.post(() -> {
+            if (!recyclerView.isComputingLayout()) {
+                // This will call first item by calling "performClick()" of view.
+                ((MyStepRecyclerViewAdapter.ViewHolder) recyclerView.findViewHolderForLayoutPosition(0)).view.performClick();
+            } else {
+                postAndNotifyAdapter(handler, recyclerView);
+            }
+        });
     }
 }
