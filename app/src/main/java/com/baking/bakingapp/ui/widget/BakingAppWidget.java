@@ -4,18 +4,22 @@ import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.widget.RemoteViews;
 
 import com.baking.bakingapp.R;
 import com.baking.bakingapp.data.BakingRepositoryImp;
 import com.baking.bakingapp.data.models.BakingWS;
+import com.baking.bakingapp.data.models.IngredientWS;
 import com.baking.bakingapp.ui.baking_detail.BakingDetailActivity;
 import com.baking.bakingapp.util.ParcelableUtil;
+import com.baking.bakingapp.util.PrefManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +29,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.baking.bakingapp.util.Constant.KEY_FAVORITE_RECIPE_ID;
+
 /**
  * Implementation of App Widget functionality.
  */
@@ -32,13 +38,17 @@ public class BakingAppWidget extends AppWidgetProvider {
 
     @NonNull
     private final BakingRepositoryImp bakingRepositoryImp = BakingRepositoryImp.getInstance();
+    private PrefManager prefManager;
 
-    void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, List<BakingWS> bakingWSList) {
+    void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, BakingWS bakingWS) {
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.baking_app_widget);
+        views.setTextViewText(R.id.recipe_name, bakingWS.name);
+
         Intent intent = new Intent(context, WidgetService.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(CollectionWidgetRemoteViewFactory.BYTE_ARRAY_LIST, getAllByteArrayList(bakingWSList));
+        bundle.putSerializable(CollectionWidgetRemoteViewFactory.BYTE_ARRAY_LIST, getAllByteArrayList(bakingWS.ingredients));
+        bundle.putSerializable(CollectionWidgetRemoteViewFactory.BYTE_BAKING_OBJECT, getByteObject(bakingWS));
         intent.putExtras(bundle);
         // Set up the collection
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -54,20 +64,45 @@ public class BakingAppWidget extends AppWidgetProvider {
         Intent activityIntent = new Intent(context, BakingDetailActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setPendingIntentTemplate(R.id.widget_list, pendingIntent);
+
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list);
+
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
-    private ArrayList<byte[]> getAllByteArrayList(List<BakingWS> bakingWSList) {
+    private ArrayList<byte[]> getAllByteArrayList(List<IngredientWS> ingredientWSList) {
         ArrayList<byte[]> byteArrayList = new ArrayList<>();
-        for (BakingWS bakingWS : bakingWSList) {
-            byteArrayList.add(ParcelableUtil.marshall(bakingWS));
+        for (IngredientWS ingredientWS : ingredientWSList) {
+            byteArrayList.add(ParcelableUtil.marshall(ingredientWS));
         }
         return byteArrayList;
     }
 
+    private byte[] getByteObject(BakingWS bakingWS) {
+        return ParcelableUtil.marshall(bakingWS);
+    }
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        fetchBakingList(context, appWidgetIds, appWidgetManager);
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+        if (intent != null && intent.getAction() != null && intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context.getApplicationContext());
+            ComponentName thisWidget = new ComponentName(context.getApplicationContext(), BakingAppWidget.class);
+            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+            fetchBakingList(context, appWidgetIds, appWidgetManager);
+        }
+    }
+
+
+    private void fetchBakingList(Context context, int[] appWidgetIds, AppWidgetManager appWidgetManager) {
+        prefManager = new PrefManager(context);
+
         bakingRepositoryImp.getBakingRecipes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -80,8 +115,21 @@ public class BakingAppWidget extends AppWidgetProvider {
                     @Override
                     public void onSuccess(List<BakingWS> bakingWSList) {
                         // There may be multiple widgets active, so update all of them
+                        String favoriteBakingRecipe = prefManager.getString(PreferenceManager.getDefaultSharedPreferences(context), KEY_FAVORITE_RECIPE_ID, "");
+
+                        BakingWS bakingWS = null;
+                        for (int i = 0; i < bakingWSList.size(); i++) {
+                            if (bakingWSList.get(i).id.toString().equals(favoriteBakingRecipe)) {
+                                bakingWS = bakingWSList.get(i);
+                            }
+                        }
+
+                        if (bakingWS == null) {
+                            bakingWS = bakingWSList.get(0);
+                        }
+
                         for (int appWidgetId : appWidgetIds) {
-                            updateAppWidget(context, appWidgetManager, appWidgetId, bakingWSList);
+                            updateAppWidget(context, appWidgetManager, appWidgetId, bakingWS);
                         }
                     }
 
