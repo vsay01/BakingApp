@@ -103,7 +103,7 @@ public class BakingAppWidget extends AppWidgetProvider {
     private void fetchBakingList(Context context, int[] appWidgetIds, AppWidgetManager appWidgetManager) {
         prefManager = new PrefManager(context);
 
-        bakingRepositoryImp.getBakingRecipes()
+        bakingRepositoryImp.getMockBakingRecipe()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<List<BakingWS>>() {
@@ -115,11 +115,11 @@ public class BakingAppWidget extends AppWidgetProvider {
                     @Override
                     public void onSuccess(List<BakingWS> bakingWSList) {
                         // There may be multiple widgets active, so update all of them
-                        String favoriteBakingRecipe = prefManager.getString(PreferenceManager.getDefaultSharedPreferences(context), KEY_FAVORITE_RECIPE_ID, "");
+                        String favoriteBakingRecipeId = prefManager.getString(PreferenceManager.getDefaultSharedPreferences(context), KEY_FAVORITE_RECIPE_ID, "");
 
                         BakingWS bakingWS = null;
                         for (int i = 0; i < bakingWSList.size(); i++) {
-                            if (bakingWSList.get(i).id.toString().equals(favoriteBakingRecipe)) {
+                            if (bakingWSList.get(i).id.toString().equals(favoriteBakingRecipeId)) {
                                 bakingWS = bakingWSList.get(i);
                             }
                         }

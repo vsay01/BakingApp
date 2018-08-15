@@ -10,4 +10,6 @@ import io.reactivex.annotations.NonNull;
 public interface IBakingRepository {
     @NonNull
     Single<List<BakingWS>> getBakingRecipes();
+
+    Single<List<BakingWS>> getMockBakingRecipe();
 }

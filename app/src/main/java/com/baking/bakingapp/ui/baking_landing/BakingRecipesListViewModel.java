@@ -29,7 +29,7 @@ public class BakingRecipesListViewModel extends AndroidViewModel {
     }
 
     public void fetchBakingRecipes() {
-        bakingRepositoryImp.getBakingRecipes()
+        bakingRepositoryImp.getMockBakingRecipe()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<List<BakingWS>>() {
