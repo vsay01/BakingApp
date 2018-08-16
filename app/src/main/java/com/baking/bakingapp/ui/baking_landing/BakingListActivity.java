@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -25,12 +26,15 @@ import com.baking.bakingapp.data.models.ResponseBakingList;
 import com.baking.bakingapp.ui.baking_detail.BakingDetailActivity;
 import com.baking.bakingapp.ui.baking_detail.BakingRecipeDetailFragment;
 import com.baking.bakingapp.util.NetworkUtils;
+import com.baking.bakingapp.util.PrefManager;
 import com.baking.bakingapp.util.ResourceUtils;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.baking.bakingapp.util.Constant.KEY_FAVORITE_RECIPE_NAME_DEFAULT;
 
 /**
  * An activity representing a list of BakingRecipes. This activity
@@ -64,12 +68,15 @@ public class BakingListActivity extends AppCompatActivity {
     // The Idling Resource which will be null in production.
     @Nullable
     private SimpleIdlingResource mIdlingResource;
+    private PrefManager prefManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_baking_recipes_list);
         ButterKnife.bind(this);
+
+        prefManager = new PrefManager(this);
 
         // Get the ViewModel.
         mViewModel = ViewModelProviders.of(this).get(BakingRecipesListViewModel.class);
@@ -128,6 +135,7 @@ public class BakingListActivity extends AppCompatActivity {
             intent.putExtra(BakingRecipeDetailFragment.ARG_ITEM_ID, bakingWS);
             startActivity(intent);
         }));
+        prefManager.setString(PreferenceManager.getDefaultSharedPreferences(this), KEY_FAVORITE_RECIPE_NAME_DEFAULT, bakingWSList.get(0).name);
     }
 
     /**

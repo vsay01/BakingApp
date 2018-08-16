@@ -1,7 +1,6 @@
 package com.baking.bakingapp.ui.baking_detail;
 
 import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -19,6 +18,8 @@ import com.baking.bakingapp.ui.widget.BakingAppWidget;
 import com.baking.bakingapp.util.PrefManager;
 
 import static com.baking.bakingapp.util.Constant.KEY_FAVORITE_RECIPE_ID;
+import static com.baking.bakingapp.util.Constant.KEY_FAVORITE_RECIPE_NAME;
+import static com.baking.bakingapp.util.Constant.KEY_FAVORITE_RECIPE_NAME_DEFAULT;
 
 /**
  * An activity representing a single BakingWS detail screen. This
@@ -96,9 +97,13 @@ public class BakingDetailActivity extends AppCompatActivity implements StepFragm
         switch (item.getItemId()) {
             case R.id.favorite:
                 if (prefManager.getString(PreferenceManager.getDefaultSharedPreferences(this), KEY_FAVORITE_RECIPE_ID, "").equals(bakingWS.id.toString())) {
+                    //unchecked favorite
                     prefManager.setString(PreferenceManager.getDefaultSharedPreferences(this), KEY_FAVORITE_RECIPE_ID, "");
+                    prefManager.setString(PreferenceManager.getDefaultSharedPreferences(this), KEY_FAVORITE_RECIPE_NAME, prefManager.getString(PreferenceManager.getDefaultSharedPreferences(this), KEY_FAVORITE_RECIPE_NAME_DEFAULT, ""));
                 } else {
+                    //checked favorite
                     prefManager.setString(PreferenceManager.getDefaultSharedPreferences(this), KEY_FAVORITE_RECIPE_ID, bakingWS.id.toString());
+                    prefManager.setString(PreferenceManager.getDefaultSharedPreferences(this), KEY_FAVORITE_RECIPE_NAME, bakingWS.name);
                 }
                 updateWidgetFavoriteRecipe();
                 invalidateOptionsMenu();
@@ -111,10 +116,6 @@ public class BakingDetailActivity extends AppCompatActivity implements StepFragm
     private void updateWidgetFavoriteRecipe() {
         Intent intent = new Intent(this, BakingAppWidget.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        // Use an array and EXTRA_APPWIDGET_IDS instead of AppWidgetManager.EXTRA_APPWIDGET_ID,
-        // since it seems the onUpdate() is only fired on that:
-        int[] ids = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), BakingAppWidget.class));
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
         sendBroadcast(intent);
     }
 }
